@@ -97,7 +97,7 @@ function App() {
           <span>City not found</span>
         </div>
       )}
-      {data.data && (
+      {data.data.main && (
         <div className="weather-card">
           <div className="city-name">
             <h2>{data.data.name}, {data.data.sys.country}</h2>
