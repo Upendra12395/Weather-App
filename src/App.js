@@ -44,13 +44,13 @@ function App() {
 
   const getWeatherInfo = async (event) => {
     console.log("event log : ", event);
-    if(event.key === 'Enter'){
+    if (event.key === 'Enter') {
       event.preventDefault();
       setQuery('');
       setData({ ...data, waiting: true });
       const url = 'https://api.openweathermap.org/data/2.5/weather';
       const api_key = 'cd7500b7c1963b5e42c888d98aabae00';
-      axios.get(url, {params : {q: query,units: 'metric',appid: api_key}})
+      axios.get(url, { params: { q: query, units: 'metric', appid: api_key } })
         .then((response) => {
           console.log("weather info : ", response.data);
           setData({ ...data, data: response.data, waiting: false, error: false })
@@ -62,66 +62,76 @@ function App() {
         })
     }
   }
-  const convertTime = (time) =>{
-    try{
-      let hours = `${new Date(time).getHours()}`.length === 1 ? 0+`${new Date(time).getHours()}` : new Date(time).getHours()
-      let minutes = `${new Date(time).getMinutes()}`.length === 1 ? 0+`${new Date(time).getMinutes()}` : new Date(time).getMinutes()
+  const convertTime = (time) => {
+    try {
+      let hours = `${new Date(time).getHours()}`.length === 1 ? 0 + `${new Date(time).getHours()}` : new Date(time).getHours()
+      let minutes = `${new Date(time).getMinutes()}`.length === 1 ? 0 + `${new Date(time).getMinutes()}` : new Date(time).getMinutes()
       return `${hours}:${minutes}`
-    }catch(err){
+    } catch (err) {
       return "06:55"
     }
   }
   return (
     <div className="App">
-      <h1> Weather Update </h1>
-      <div className='search-bar'>
-        <input className = 'city-search' type='text' name='city' value={query} placeholder='Enter the city name...' onChange={event => setQuery(event.target.value)} onKeyPress={getWeatherInfo} />
+      <h1>Weather Update</h1>
+      <div className="search-bar">
+        <input
+          className="city-search"
+          type="text"
+          name="city"
+          value={query}
+          placeholder="Enter the city name..."
+          onChange={event => setQuery(event.target.value)}
+          onKeyPress={getWeatherInfo}
+        />
+        <button onClick={getWeatherInfo} className="search-button">Search</button>
       </div>
-      {data.waiting && <>
-        <br />
-        <br />
-        <Oval type="Oval" color="black" height={100} width={100} />
-      </>
-      }
-      {data.error && <>
-        <br />
-        <br />
-        <span className="error-message">
+      {data.waiting && (
+        <div className="loading">
+          <Oval type="Oval" color="#007BFF" height={100} width={100} />
+        </div>
+      )}
+      {data.error && (
+        <div className="error-message">
           <FontAwesomeIcon icon={faFrown} />
-          <span style={{ fontSize: '20px' }}>City not found</span>
-        </span>
-      </>}
-      {data.data.main && 
-        <div>
-          <div className='city-name'>
-            <h2> {data.data.name}, {data.data.sys.country} </h2>
+          <span>City not found</span>
+        </div>
+      )}
+      {data.data && (
+        <div className="weather-card">
+          <div className="city-name">
+            <h2>{data.data.name}, {data.data.sys.country}</h2>
+            <p>{getDate()}</p>
           </div>
-          <div className='date'> 
-            <span> {getDate()} </span>
-          </div>
-          <div>
-            <img 
-            className='weather-logo'
+          <img
+            className="weather-logo"
             src={`https://openweathermap.org/img/wn/${data.data.weather[0].icon}@2x.png`}
             alt={data.data.weather[0].description}
-            />
-            <span>Feels Like : {Math.round(data.data.main.feels_like)} <sup className="deg">°C</sup></span>
-            <span> Max : {Math.round(data.data.main.temp_max)} <sup className="deg">°C</sup></span>
-            <span> Min : {Math.round(data.data.main.temp_min)} <sup className="deg">°C</sup></span>
-            <span> Visibilty : {data.data.visibility/1000} km</span>
-            <span> Humidity : {data.data.main.humidity}</span>
-            <div>
-              <h3> Wind </h3>
-              <span></span>Speed : {data.data.wind.speed} km/h
+          />
+          <div className="temperature">
+            <div className="feels-like">
+              <strong>Feels Like:</strong> {Math.round(data.data.main.feels_like)}<sup>°C</sup>
             </div>
-            <div>
-              <h3> Day info </h3>
-              <span> Sunrise : {convertTime(data.data.sys.sunrise)} AM </span>
-              <span> Sunset : {convertTime(data.data.sys.sunset)} PM </span>
+            <div className="max-min">
+              <p><strong>Max:</strong> {Math.round(data.data.main.temp_max)}<sup>°C</sup></p>
+              <p><strong>Min:</strong> {Math.round(data.data.main.temp_min)}<sup>°C</sup></p>
             </div>
           </div>
+          <div className="additional-info">
+            <p><strong>Visibility:</strong> {data.data.visibility / 1000} km</p>
+            <p><strong>Humidity:</strong> {data.data.main.humidity}%</p>
+          </div>
+          <div className="wind-info">
+            <h4>Breeze Details</h4>
+            <p>Speed: {data.data.wind.speed} km/h</p>
+          </div>
+          <div className="day-info">
+            <h4>Sun Activity</h4>
+            <p>Sunrise: {convertTime(data.data.sys.sunrise)} AM</p>
+            <p>Sunset: {convertTime(data.data.sys.sunset)} PM</p>
+          </div>
         </div>
-      }
+      )}
     </div>
   );
 }
